@@ -19,7 +19,13 @@ namespace BLL.Services
         public Service Create(Doctor record)
         {
             if (_db.Doctors.Any(u => u.Name.ToUpper() == record.Name.ToUpper().Trim() && u.Surname.ToUpper() == record.Surname.ToUpper().Trim()))
-                return Error("Doctor with the same name,surname and romm already exist");
+                return Error("Doctor with the same name,surname already exist");
+            var existingDoctor = _db.Doctors.Include(d => d.Room).FirstOrDefault(d => d.RoomId == record.RoomId);
+
+            if (existingDoctor != null)
+            {
+                return Error($"Room number {existingDoctor.Room?.Number} is already assigned to Dr. {existingDoctor.Name} {existingDoctor.Surname}");
+            }
             record.Name = record.Name?.Trim();
             record.Surname = record.Surname?.Trim();
             _db.Doctors.Add(record);

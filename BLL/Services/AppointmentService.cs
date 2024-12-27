@@ -13,6 +13,10 @@ namespace BLL.Services
 
         public Service Create(Appointment record)
         {
+            if (_db.Appointments.Any(a => a.DoctorId==record.DoctorId && a.Hour == record.Hour))
+                return Error("Appointment has already exist. Choose another day or time");
+            //var doctor = _db.Doctors.Include(d => d.Branch).FirstOrDefault(d => d.DoctorId == record.DoctorId);
+            //record.BranchId = doctor.BranchId;
             record.Hour = record.Hour;
             record.Price = record.Price;
             _db.Appointments.Add(record);
@@ -38,6 +42,8 @@ namespace BLL.Services
 
         public Service Update(Appointment record)
         {
+            if (_db.Appointments.Any(a => a.DoctorId == record.DoctorId && a.Hour == record.Hour))
+                return Error("Appointment has already exist. Choose another day or time");
             var entity = _db.Appointments.SingleOrDefault(t => t.AppointmentId == record.AppointmentId);
             if (entity == null)
                 return Error("Appointment not found!");
